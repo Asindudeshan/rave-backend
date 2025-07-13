@@ -1,0 +1,547 @@
+openapi: "3.1.1"
+info:
+  title: Rave Collection E-commerce API
+  description: API for Rave Collection shoe shop e-commerce and inventory management system
+  version: 1.0.0
+  contact:
+    name: Rave Collection
+    email: support@ravecollection.com
+
+servers:
+  - url: http://localhost:5005/api
+    description: Development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication endpoints
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistration"
+      responses:
+        "201":
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+
+  /auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Get user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # Product endpoints
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Get all products
+      security: []
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      tags:
+        - Products
+      summary: Create new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Get product by ID
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    put:
+      tags:
+        - Products
+      summary: Update product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      tags:
+        - Products
+      summary: Delete product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Product deleted
+
+  /products/{id}/stock:
+    put:
+      tags:
+        - Products
+      summary: Update product stock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - stock
+              properties:
+                stock:
+                  type: integer
+      responses:
+        "200":
+          description: Stock updated
+
+  # Category endpoints
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: Get all categories
+      security: []
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  # Order endpoints
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Get all orders (Admin only)
+      responses:
+        "200":
+          description: List of all orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      tags:
+        - Orders
+      summary: Create new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/my-orders:
+    get:
+      tags:
+        - Orders
+      summary: Get user's orders
+      responses:
+        "200":
+          description: User's orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /orders/{id}/status:
+    put:
+      tags:
+        - Orders
+      summary: Update order status (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [pending, completed, rejected]
+      responses:
+        "200":
+          description: Order status updated
+
+  # Billing endpoints
+  /billing/summary:
+    get:
+      tags:
+        - Billing
+      summary: Get billing summary
+      responses:
+        "200":
+          description: Billing summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingSummary"
+
+  /billing/recent-orders:
+    get:
+      tags:
+        - Billing
+      summary: Get recent orders
+      responses:
+        "200":
+          description: Recent orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /billing/best-products:
+    get:
+      tags:
+        - Billing
+      summary: Get best selling products
+      responses:
+        "200":
+          description: Best selling products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BestProduct"
+
+  /billing/daily-sales:
+    get:
+      tags:
+        - Billing
+      summary: Get daily sales data
+      responses:
+        "200":
+          description: Daily sales data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailySales"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [customer, admin]
+        created_at:
+          type: string
+          format: date-time
+
+    UserRegistration:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        role:
+          type: string
+          enum: [customer, admin]
+          default: customer
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: decimal
+        brand:
+          type: string
+        category_id:
+          type: integer
+        stock:
+          type: integer
+        image_url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    ProductInput:
+      type: object
+      required:
+        - name
+        - price
+        - brand
+        - category_id
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: decimal
+        brand:
+          type: string
+        category_id:
+          type: integer
+        stock:
+          type: integer
+          default: 0
+        image_url:
+          type: string
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        customer_name:
+          type: string
+        total_amount:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [pending, completed, rejected]
+        created_at:
+          type: string
+          format: date-time
+
+    OrderInput:
+      type: object
+      required:
+        - items
+        - total_amount
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: integer
+              quantity:
+                type: integer
+              price:
+                type: number
+                format: decimal
+        total_amount:
+          type: number
+          format: decimal
+
+    BillingSummary:
+      type: object
+      properties:
+        total_orders:
+          type: integer
+        total_revenue:
+          type: number
+          format: decimal
+        avg_order_value:
+          type: number
+          format: decimal
+        total_customers:
+          type: integer
+
+    BestProduct:
+      type: object
+      properties:
+        name:
+          type: string
+        brand:
+          type: string
+        total_sold:
+          type: integer
+        total_revenue:
+          type: number
+          format: decimal
+
+    DailySales:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        orders_count:
+          type: integer
+        daily_revenue:
+          type: number
+          format: decimal
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string

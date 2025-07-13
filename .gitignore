@@ -1,0 +1,18 @@
+# Node.js / Express
+node_modules/
+
+# React
+/client/build/
+/client/node_modules/
+/client/.env
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

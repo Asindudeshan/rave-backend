@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rave Collection - Billing Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            background: #34495e;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .status-completed {
+            background: #27ae60;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #f39c12;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Rave Collection - Billing Dashboard</h1>
+        <p>M.G.Janma Rashmith's Store Management System</p>
+    </div>
+
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card">
+                <h3>Total Orders</h3>
+                <div class="value" id="totalOrders">-</div>
+            </div>
+            <div class="card">
+                <h3>Total Revenue</h3>
+                <div class="value" id="totalRevenue">-</div>
+            </div>
+            <div class="card">
+                <h3>Average Order</h3>
+                <div class="value" id="avgOrder">-</div>
+            </div>
+            <div class="card">
+                <h3>Total Customers</h3>
+                <div class="value" id="totalCustomers">-</div>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <!-- Recent Orders -->
+            <div class="section">
+                <div class="section-header">Recent Orders</div>
+                <div class="section-content">
+                    <div id="recentOrdersLoading" class="loading">Loading orders...</div>
+                    <table id="recentOrdersTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Best Selling Products -->
+            <div class="section">
+                <div class="section-header">Best Selling Products</div>
+                <div class="section-content">
+                    <div id="bestProductsLoading" class="loading">Loading products...</div>
+                    <table id="bestProductsTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bestProductsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Sales -->
+        <div class="section">
+            <div class="section-header">Daily Sales (Last 7 Days)</div>
+            <div class="section-content">
+                <div id="dailySalesLoading" class="loading">Loading sales data...</div>
+                <table id="dailySalesTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Orders</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailySalesBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display dashboard data
+        async function loadDashboard() {
+            try {
+                // Load summary
+                const summaryResponse = await fetch('/api/billing/summary');
+                const summary = await summaryResponse.json();
+
+                document.getElementById('totalOrders').textContent = summary.total_orders || 0;
+                document.getElementById('totalRevenue').textContent = `$${(summary.total_revenue || 0).toFixed(2)}`;
+                document.getElementById('avgOrder').textContent = `$${(summary.avg_order_value || 0).toFixed(2)}`;
+                document.getElementById('totalCustomers').textContent = summary.total_customers || 0;
+
+                // Load recent orders
+                const ordersResponse = await fetch('/api/billing/recent-orders');
+                const orders = await ordersResponse.json();
+
+                const ordersBody = document.getElementById('recentOrdersBody');
+                ordersBody.innerHTML = '';
+
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${order.id}</td>
+                        <td>${order.customer_name}</td>
+                        <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                        <td><span class="status-${order.status}">${order.status}</span></td>
+                        <td>$${order.total_amount.toFixed(2)}</td>
+                    `;
+                    ordersBody.appendChild(row);
+                });
+
+                document.getElementById('recentOrdersLoading').style.display = 'none';
+                document.getElementById('recentOrdersTable').style.display = 'table';
+
+                // Load best products
+                const productsResponse = await fetch('/api/billing/best-products');
+                const products = await productsResponse.json();
+
+                const productsBody = document.getElementById('bestProductsBody');
+                productsBody.innerHTML = '';
+
+                products.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.name}<br><small>${product.brand}</small></td>
+                        <td>${product.total_sold}</td>
+                        <td>$${product.total_revenue.toFixed(2)}</td>
+                    `;
+                    productsBody.appendChild(row);
+                });
+
+                document.getElementById('bestProductsLoading').style.display = 'none';
+                document.getElementById('bestProductsTable').style.display = 'table';
+
+                // Load daily sales
+                const salesResponse = await fetch('/api/billing/daily-sales');
+                const sales = await salesResponse.json();
+
+                const salesBody = document.getElementById('dailySalesBody');
+                salesBody.innerHTML = '';
+
+                sales.forEach(sale => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${new Date(sale.date).toLocaleDateString()}</td>
+                        <td>${sale.orders_count}</td>
+                        <td>$${sale.daily_revenue.toFixed(2)}</td>
+                    `;
+                    salesBody.appendChild(row);
+                });
+
+                document.getElementById('dailySalesLoading').style.display = 'none';
+                document.getElementById('dailySalesTable').style.display = 'table';
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        // Refresh every 5 minutes
+        setInterval(loadDashboard, 300000);
+    </script>
+</body>
+
+</html>
