@@ -20,4 +20,4 @@ USER 10014
 
 EXPOSE 5005
 
-CMD ["sh", "-c", "node scripts/setup-database.js && node server.js"]
+CMD ["node server.js"]
