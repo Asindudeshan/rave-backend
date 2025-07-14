@@ -12,6 +12,18 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+
+// Print environment info for debugging
+console.log("Environment:", {
+  NODE_ENV: process.env.NODE_ENV,
+  DB_HOST: process.env.DB_HOST,
+  DB_USER: process.env.DB_USER,
+  DB_NAME: process.env.DB_NAME,
+  PORT: PORT,
+  // Masking password for security
+  DB_PASSWORD: process.env.DB_PASSWORD ? "********" : "not set",
+});
+
 // Initialize Knex with the appropriate environment
 const environment = process.env.NODE_ENV || "development";
 const knexConfig = require("./knexfile")[environment];
