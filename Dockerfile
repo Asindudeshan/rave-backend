@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 5005
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "node scripts/setup-database.js && node server.js"]
