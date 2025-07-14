@@ -20,4 +20,4 @@ USER 10014
 
 EXPOSE 5005
 
-CMD ["node server.js"]
+CMD ["node", "server.js"]
