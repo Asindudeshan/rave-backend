@@ -18,11 +18,31 @@ const knexConfig = require("./knexfile")[environment];
 const db = knex(knexConfig);
 
 // Middleware
-app.use(cors({
-  origin: '*', // Allow requests from any origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+      // Allow all origins
+      return callback(null, origin);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // Allow cookies and credentials
+  })
+);
+
+// Add additional CORS headers for preflight requests
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.status(200).send();
+});
 app.use(express.json());
 app.use(express.static("public"));
 
