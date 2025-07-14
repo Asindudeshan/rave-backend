@@ -29,27 +29,8 @@ const environment = process.env.NODE_ENV || "development";
 const knexConfig = require("./knexfile")[environment];
 const db = knex(knexConfig);
 
-// Middleware
-const allowedOrigins = [
-  "https://rave-frontend.vercel.app",
-  "http://localhost:3000",
-];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    console.log("CORS origin request:", origin); // Log for debugging
-    if (!origin) return callback(null, true); // Allow non-browser tools
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error("Not allowed by CORS"));
-  },
- 
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: "Content-Type",
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 
 app.use(express.json());
